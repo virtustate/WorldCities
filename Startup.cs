@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using WorldCities.Data;
 
 namespace WorldCities
 {
@@ -20,12 +22,29 @@ namespace WorldCities
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                        .AddJsonOptions(options => {
+                            // set this option to TRUE to indent the JSON output
+                            options.JsonSerializerOptions.WriteIndented = true;
+                            // set this option to NULL to use PascalCase instead of
+                            // camelCase (default)
+                            // options.JsonSerializerOptions.PropertyNamingPolicy =
+                            // null;
+                        });
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            // Add EntityFramework support for SqlServer.
+            //services.AddEntityFrameworkSqlServer();
+
+            // Add ApplicationDbContext.
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")
+                    )
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
