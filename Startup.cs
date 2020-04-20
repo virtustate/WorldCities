@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using WorldCities.Data;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 
 namespace WorldCities
 {
@@ -22,7 +23,8 @@ namespace WorldCities
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews()
+            // https://stackoverflow.com/questions/55787018/net-core-3-preview-4-addnewtonsoftjson-is-not-defined
+            services.AddControllersWithViews().AddNewtonsoftJson()
                         .AddJsonOptions(options => {
                             // set this option to TRUE to indent the JSON output
                             options.JsonSerializerOptions.WriteIndented = true;
