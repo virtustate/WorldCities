@@ -14,6 +14,7 @@ import { CountryEditComponent } from './countries/country-edit.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { BaseFormComponent } from './base.form.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
     CityEditComponent,
     CountriesComponent,
     CountryEditComponent,
+    BaseFormComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

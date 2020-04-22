@@ -1,10 +1,11 @@
 import { Component, Inject, ViewChild } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+//import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-
 import { City } from './city';
+import { CityService } from './city.service';
+import { ApiResult } from '../base.service';
 
 @Component({
   selector: 'app-cities',
@@ -12,7 +13,7 @@ import { City } from './city';
   styleUrls: ['./cities.component.css']
 })
 export class CitiesComponent {
-  public displayedColumns: string[] = ['id', 'name', 'lat', 'lon'];
+  public displayedColumns: string[] = ['id', 'name', 'lat', 'lon', 'countryName'];
   public cities: MatTableDataSource<City>;
 
   defaultPageIndex: number = 0;
@@ -26,11 +27,8 @@ export class CitiesComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(
-    private http: HttpClient,
-    @Inject('BASE_URL') private baseUrl: string) {
-  }
-
+  constructor(private cityService: CityService) { }
+   
   ngOnInit() {
     this.loadData(null);
   }
@@ -46,24 +44,29 @@ export class CitiesComponent {
   }
 
   getData(event: PageEvent) {
-    var url = this.baseUrl + 'api/Cities';
-    var params = new HttpParams()
-      .set("pageIndex", event.pageIndex.toString())
-      .set("pageSize", event.pageSize.toString())
-      .set("sortColumn", (this.sort)
-        ? this.sort.active
-        : this.defaultSortColumn)
-      .set("sortOrder", (this.sort)
-        ? this.sort.direction
-        : this.defaultSortOrder);
+    var sortColumn = (this.sort)
+      ? this.sort.active
+      : this.defaultSortColumn;
 
-    if (this.filterQuery) {
-      params = params
-        .set("filterColumn", this.defaultFilterColumn)
-        .set("filterQuery", this.filterQuery);
-    }
+    var sortOrder = (this.sort)
+      ? this.sort.direction
+      : this.defaultSortOrder;
 
-    this.http.get<any>(url, { params })
+    var filterColumn = (this.filterQuery)
+      ? this.defaultFilterColumn
+      : null;
+
+    var filterQuery = (this.filterQuery)
+      ? this.filterQuery
+      : null;
+
+    this.cityService.getData<ApiResult<City>>(
+      event.pageIndex,
+      event.pageSize,
+      sortColumn,
+      sortOrder,
+      filterColumn,
+      filterQuery)
       .subscribe(result => {
         this.paginator.length = result.totalCount;
         this.paginator.pageIndex = result.pageIndex;
