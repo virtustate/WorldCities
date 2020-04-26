@@ -1,22 +1,22 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using WorldCities.Data;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using WorldCities.Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 
 namespace WorldCities
 {
-    public class Startup
+    public class StartupSave
     {
-        public Startup(IConfiguration configuration)
+        public StartupSave(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -26,23 +26,23 @@ namespace WorldCities
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews()
-                .AddJsonOptions(options => {
-                    // set this option to TRUE to indent the JSON output
-                    options.JsonSerializerOptions.WriteIndented = true;
-                    // set this option to NULL to use PascalCase instead of CamelCase (default)
-                    // options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                });
-
-
+            // https://stackoverflow.com/questions/55787018/net-core-3-preview-4-addnewtonsoftjson-is-not-defined
+            services.AddControllersWithViews().AddNewtonsoftJson()
+                        .AddJsonOptions(options => {
+                            // set this option to TRUE to indent the JSON output
+                            options.JsonSerializerOptions.WriteIndented = true;
+                            // set this option to NULL to use PascalCase instead of
+                            // camelCase (default)
+                            // options.JsonSerializerOptions.PropertyNamingPolicy =
+                            // null;
+                        });
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-
             // Add EntityFramework support for SqlServer.
-            services.AddEntityFrameworkSqlServer();
+            //services.AddEntityFrameworkSqlServer();
 
             // Add ApplicationDbContext.
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -55,9 +55,9 @@ namespace WorldCities
             services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
-                options.Password.RequireDigit = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequiredLength = 8;
             })
