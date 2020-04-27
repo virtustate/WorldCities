@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 using WorldCities.Data;
 using WorldCities.Data.Models;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace WorldCities
 {
@@ -86,10 +87,41 @@ namespace WorldCities
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            // add .webmanifest MIME-type support
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".webmanifest"] = "application/manifest+json";
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                ContentTypeProvider = provider,
+                OnPrepareResponse = (context) =>
+                {
+                    if (context.File.Name == "isOnline.txt")
+                    {
+                        // disable caching for these files
+                        context.Context.Response.Headers.Add("Cache-Control",
+                         "no-cache, no-store");
+                        context.Context.Response.Headers.Add("Expires", "-1");
+                    }
+                    else
+                    {
+                        // Retrieve cache configuration from appsettings.json
+                        context.Context.Response.Headers["Cache-Control"] =
+                            Configuration["StaticFiles:Headers:Cache-Control"];
+                        context.Context.Response.Headers["Pragma"] =
+                            Configuration["StaticFiles:Headers:Pragma"];
+                        context.Context.Response.Headers["Expires"] =
+                            Configuration["StaticFiles:Headers:Expires"];
+                    }
+                }
+            });
+
             if (!env.IsDevelopment())
             {
-                app.UseSpaStaticFiles();
+                app.UseSpaStaticFiles(new StaticFileOptions()
+                {
+                    ContentTypeProvider = provider
+                });
             }
 
             app.UseRouting();

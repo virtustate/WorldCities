@@ -19,6 +19,8 @@ import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { CityService } from './cities/city.service';
 import { CountryService } from './countries/country.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -45,9 +47,13 @@ import { CountryService } from './countries/country.service';
       { path: 'country/:id', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
       { path: 'country', component: CountryEditComponent, canActivate: [AuthorizeGuard] },
     ]),
+    ServiceWorkerModule.register(
+      'ngsw-worker.js',
+      { registrationStrategy: 'registerImmediately' }),
     BrowserAnimationsModule,
     AngularMaterialModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     CityService,
