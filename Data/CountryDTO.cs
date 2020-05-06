@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
+﻿using System.Text.Json.Serialization;
 
 namespace WorldCities.Data
 {
@@ -13,10 +11,10 @@ namespace WorldCities.Data
 
         public string Name { get; set; }
 
-        [JsonPropertyAttribute("iso2")]
+        [JsonPropertyName("iso2")]
         public string ISO2 { get; set; }
 
-        [JsonPropertyAttribute("iso3")]
+        [JsonPropertyName("iso3")]
         public string ISO3 { get; set; }
 
         public int TotCities { get; set; }
